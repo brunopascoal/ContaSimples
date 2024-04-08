@@ -6,7 +6,8 @@ import re
 
 def run_tratar_balancetes_app():
     def extrair_mes(nome_arquivo, nome_sheet):
-        meses = meses_escritos = {
+        # Dicionário com meses escritos por extenso
+        meses_escritos = {
             "JAN": "jan",
             "FEV": "fev",
             "MAR": "mar",
@@ -20,12 +21,44 @@ def run_tratar_balancetes_app():
             "NOV": "nov",
             "DEZ": "dez",
         }
+
+        # Dicionário com os meses em formato numérico
+        meses_numericos = {
+            "01": "jan",
+            "02": "fev",
+            "03": "mar",
+            "04": "abr",
+            "05": "mai",
+            "06": "jun",
+            "07": "jul",
+            "08": "ago",
+            "09": "set",
+            "10": "out",
+            "11": "nov",
+            "12": "dez",
+        }
+
+        # Unindo os dois dicionários
+        meses = {**meses_escritos, **meses_numericos}
+
+        # Verifica se algum dos meses por extenso ou numérico está no nome do arquivo ou da sheet
         for chave, valor in meses.items():
             if (
                 chave.lower() in nome_arquivo.lower()
                 or chave.lower() in nome_sheet.lower()
             ):
                 return valor
+
+        # Adicionalmente, verifica por números que representem meses no formato MMYYYY ou YYYYMM
+        padrao = re.compile(
+            r"\b(0[1-9]|1[012])(20[0-9]{2})\b|\b(20[0-9]{2})(0[1-9]|1[012])\b"
+        )
+        busca = padrao.search(nome_arquivo + nome_sheet)
+        if busca:
+            mes = busca.group(1) or busca.group(4)
+            if mes in meses_numericos:
+                return meses_numericos[mes]
+
         return "mes_desconhecido"
 
     # Função para processar cada arquivo Excel
@@ -54,7 +87,7 @@ def run_tratar_balancetes_app():
 
             dfs_processados[mes] = df_processado
 
-            st.write(f"Sheet: {sheet} - Mês: {mes.upper()}", df_processado)
+            # st.write(f"Sheet: {sheet} - Mês: {mes.upper()}", df_processado)
 
         return dfs_processados
 

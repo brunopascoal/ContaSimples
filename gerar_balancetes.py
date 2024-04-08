@@ -24,7 +24,6 @@ def run_gerar_balancetes_app():
         ]
         return meses[mes - 1]
 
-
     def gerar_sumario(df, mesInicial, mesFinal):
         # Colunas para agrupar e sumarizar
         colunas_sumarizacao = ["CONTA"]
@@ -52,7 +51,6 @@ def run_gerar_balancetes_app():
         df_sumario = df.groupby(colunas_sumarizacao).agg(agregacoes)
         return df_sumario
 
-
     def adicionar_campo_variacao(df, mesInicial, mesSeguinte):
         mesInicialAbrev = mes_abreviado(mesInicial)
         mesSeguinteAbrev = mes_abreviado(mesSeguinte)
@@ -60,17 +58,19 @@ def run_gerar_balancetes_app():
         nome_campo_variacao = f"VAR_{mesInicialAbrev}"
         # Calculando a variação
         df[nome_campo_variacao] = df.apply(
-            lambda row: 0
-            if row[f"MOVIMENTO {mesInicialAbrev}"] == 0
-            else (
-                row[f"MOVIMENTO {mesInicialAbrev}"] - row[f"MOVIMENTO {mesSeguinteAbrev}"]
-            )
-            / row[f"MOVIMENTO {mesInicialAbrev}"],
+            lambda row: (
+                0
+                if row[f"MOVIMENTO {mesInicialAbrev}"] == 0
+                else (
+                    row[f"MOVIMENTO {mesInicialAbrev}"]
+                    - row[f"MOVIMENTO {mesSeguinteAbrev}"]
+                )
+                / row[f"MOVIMENTO {mesInicialAbrev}"]
+            ),
             axis=1,
         )
         # Arredondando os valores para 2 casas decimais
         df[nome_campo_variacao] = df[nome_campo_variacao].round(2)
-
 
     def adicionar_campo_saldo_anual(df, mesInicial, mesFinal):
         # Inicializando a coluna de saldo anual
@@ -82,104 +82,135 @@ def run_gerar_balancetes_app():
         # Arredondando os valores para 2 casas decimais
         df["SALDO_ANUAL"] = df["SALDO_ANUAL"].round(2)
 
-
     def adicionar_campo_conferencia_auditoria(df, mesFinal):
         mesFinalAbrev = mes_abreviado(mesFinal)
 
         # Calculando a conferência de auditoria
-        df["CONFERÊNCIA_AUDITORIA"] = df["SALDO_ANUAL"] - df[f"SALDO FINAL {mesFinalAbrev}"]
+        df["CONFERÊNCIA_AUDITORIA"] = (
+            df["SALDO_ANUAL"] - df[f"SALDO FINAL {mesFinalAbrev}"]
+        )
 
         # Arredondando os valores para 2 casas decimais
         df["CONFERÊNCIA_AUDITORIA"] = df["CONFERÊNCIA_AUDITORIA"].round(2)
 
+    def reordenar_colunas(df_sumario, mesInicial, mesFinal):
+        colunas_base = ["CONTA", "DESCRIÇÃO"]
+        colunas_condicionais = [
+            col for col in ["tipo", "RED"] if col in df_sumario.columns
+        ]
+        colunas_meses = []
+
+        for mes in range(mesInicial, mesFinal + 1):
+            mes_abrev = mes_abreviado(mes)
+            colunas_mes = [
+                f"SALDO INICIAL {mes_abrev}" if mes == mesInicial else None,
+                f"DEBITO {mes_abrev}",
+                f"CREDITO {mes_abrev}",
+                f"MOVIMENTO {mes_abrev}",
+                f"VAR_{mes_abrev}" if mes != mesFinal else None,
+            ]
+            colunas_meses.extend(filter(None, colunas_mes))
+
+        colunas_finais = [
+            f"SALDO FINAL {mes_abreviado(mesFinal)}",
+            "SALDO_ANUAL",
+            "CONFERÊNCIA_AUDITORIA",
+        ]
+
+        # Combina todas as colunas na ordem desejada
+        colunas_ordenadas = (
+            colunas_base + colunas_condicionais + colunas_meses + colunas_finais
+        )
+
+        # Reordena o DataFrame
+        df_reordenado = df_sumario[colunas_ordenadas]
+
+        return df_reordenado
 
     def main():
         st.title("Gerar Balancetes")
 
-        # Upload de múltiplos arquivos
         uploaded_files = st.file_uploader(
             "Escolha os arquivos dos balancetes (JAN a DEZ)",
             accept_multiple_files=True,
             type=["xlsx"],
         )
 
-        # Seleção do intervalo de meses
-        numMesUm, numUltimoMes = st.slider("Selecione o intervalo de meses", 1, 12, (1, 12))
+        numMesUm, numUltimoMes = st.slider(
+            "Selecione o intervalo de meses", 1, 12, (1, 12)
+        )
 
-        if st.button("Gerar Balancete"):
-            if uploaded_files:
-                dfs = []
-                for uploaded_file in uploaded_files:
-                    try:
-                        # Lê cada arquivo Excel
-                        xls = pd.ExcelFile(uploaded_file)
+        nome_planilhas = {
+            1: "Jan",
+            2: "Fev",
+            3: "Mar",
+            4: "Abr",
+            5: "Mai",
+            6: "Jun",
+            7: "Jul",
+            8: "Ago",
+            9: "Set",
+            10: "Out",
+            11: "Nov",
+            12: "Dez",
+        }
 
-                        # Iterar sobre as sheets no intervalo de meses selecionado
-                        for i in range(numMesUm, numUltimoMes + 1):
-                            mes = xls.sheet_names[i - 1]
-                            df = pd.read_excel(xls, sheet_name=mes)
-                            # Processamento específico para cada sheet/mês
+        if st.button("Gerar Balancete", key="gerar_balancete") and uploaded_files:
+            dfs = []
+            for uploaded_file in uploaded_files:
+                try:
+                    xls = pd.ExcelFile(uploaded_file)
+                    sheet_names = xls.sheet_names  # Obtém a lista de todas as planilhas
+                    # Determina os nomes das planilhas com base na seleção do usuário
+                    for mes in range(numMesUm, numUltimoMes + 1):
+                        nome_planilha = nome_planilhas.get(
+                            mes
+                        )  # Obtém o nome da planilha para o mês
+                        if (
+                            nome_planilha in sheet_names
+                        ):  # Verifica se a planilha existe
+                            df = pd.read_excel(xls, sheet_name=nome_planilha)
                             dfs.append(df)
-                    except Exception as e:
-                        st.error(f"Erro ao ler o arquivo: {e}")
+                            st.write(f"DataFrame do mês: {nome_planilha}")
+                            st.dataframe(df)
+                        else:
+                            st.error(
+                                f"Não foi possível encontrar a planilha para o mês {mes} ({nome_planilha}). Verifique se o arquivo contém todas as planilhas necessárias."
+                            )
+                except Exception as e:
+                    st.error(f"Erro ao processar o arquivo: {e}")
+            st.write("Finalizado... Processando dados")
 
-                if dfs:
-                    # Combina os DataFrames de cada mês em um único DataFrame
-                    df_combinado = pd.concat(dfs)
+            if dfs:
+                # Combina os DataFrames de cada mês em um único DataFrame
+                df_combinado = pd.concat(dfs, ignore_index=True)
 
-                    # Processamento dos dados
-                    df_sumario = gerar_sumario(df_combinado, numMesUm, numUltimoMes)
-                    for i in range(numMesUm, numUltimoMes):
-                        adicionar_campo_variacao(df_sumario, i, i + 1)
-                    adicionar_campo_saldo_anual(df_sumario, numMesUm, numUltimoMes)
-                    adicionar_campo_conferencia_auditoria(df_sumario, numUltimoMes)
-
-                    # Reordenando as colunas (implemente de acordo com suas necessidades)
-                    colunas_dinamicas = []
-                    for i in range(numMesUm, numUltimoMes + 1):
-                        mes_abrev = mes_abreviado(i)
-                        colunas_dinamicas += [
-                            f"SALDO INICIAL {mes_abrev}",
-                            f"DEBITO {mes_abrev}",
-                            f"CREDITO {mes_abrev}",
-                            f"MOVIMENTO {mes_abrev}",
-                        ]
-                        if i < numUltimoMes:  # Para adicionar VAR_ apenas entre meses consecutivos
-                            colunas_dinamicas.append(f"VAR_{mes_abrev}")
-
-                    # Adicionar Saldo Anual, Saldo Final e Conferência de Auditoria para o mês final
-                    colunas_dinamicas += [
-                        "SALDO_ANUAL",
-                        f"SALDO FINAL {mes_abreviado(numUltimoMes)}",
-                        "CONFERÊNCIA_AUDITORIA",
-                    ]
-
-                    # Definição da Ordem Desejada com Base nas Colunas Dinâmicas
-                    desired_order = ["tipo", "CONTA", "RED", "DESCRIÇÃO"] + colunas_dinamicas
-
-                    # Filtrar a lista para incluir apenas colunas existentes no DataFrame
-                    filtered_order = [col for col in desired_order if col in df_sumario.columns]
-
-                    # Reordenando as colunas
-                    try:
-                        df_sumario = df_sumario[filtered_order]
-                    except KeyError as e:
-                        st.error(f"Erro ao reordenar as colunas: {e}")
-
-                    # Botão para baixar o resultado
+                # Processamento dos dados
+                df_sumario = gerar_sumario(df_combinado, numMesUm, numUltimoMes)
+                for i in range(numMesUm, numUltimoMes):
+                    adicionar_campo_variacao(df_sumario, i, i + 1)
+                adicionar_campo_saldo_anual(df_sumario, numMesUm, numUltimoMes)
+                adicionar_campo_conferencia_auditoria(df_sumario, numUltimoMes)
+                df_sumario_reordenado = reordenar_colunas(
+                    df_sumario, numMesUm, numUltimoMes
+                )
+                st.dataframe(df_sumario_reordenado)
+                # Botão para baixar o resultado
                 output = io.BytesIO()
-                df_sumario.to_excel(output, index=False)
+                df_sumario_reordenado.to_excel(output, index=False)
                 output.seek(0)  # Voltar ao início do stream
                 st.download_button(
-                    label="Baixar Balancete Final Modificado",
+                    label="Baixar Balancete Final",
                     data=output,
-                    file_name="Balancete_Final_Modificado.xlsx",
+                    file_name="Balancete Final.xlsx",
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 )
             else:
-                st.error("Nenhum dado foi carregado dos arquivos.")
+                st.write("Deu ruim:")
+
         else:
-            st.warning(
+            st.error(
                 "Por favor, carregue os arquivos dos balancetes antes de gerar o relatório."
             )
+
     main()
