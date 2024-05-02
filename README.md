@@ -6,7 +6,8 @@
 ![Bitbucket open issues](https://img.shields.io/bitbucket/issues/brunopascoal/sistema_DI?style=for-the-badge)
 ![Bitbucket open pull requests](https://img.shields.io/bitbucket/pr-raw/brunopascoal/sistema_DI?style=for-the-badge)
 
-> Este é um sistema de geração de alguns relatórios, como Balancetes, Relátorios Financeiros, SPEDS Fiscais e Seleções Aleatórias
+> O sistema é uma ferramenta eficaz para a manipulação de dados financeiros e contábeis, utilizando a biblioteca Pandas. Ele permite o upload de arquivos Excel ou CSV para tratamento e geração de balancetes. Além disso, suporta a leitura e exportação de SPEDs fiscais análiticos e resumos. Utiliza seleções aleatórias baseadas em sementes para análises específicas e produz relatórios financeiros detalhados, incluindo AGING, PEC e relatórios de Maiores Contabilidades. É ideal para quem busca precisão e eficiência na gestão de informações contábeis e fiscais.
+
 
 <!-- # Imagens -->
 

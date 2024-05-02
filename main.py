@@ -5,6 +5,7 @@ from relatorios_financeiros import run_relatorios_app
 from selecoes import run_selecoes_app
 from tratar_balancetes import run_tratar_balancetes_app
 from gerar_balancetes import run_gerar_balancetes_app
+from conferencia_balancete import run_conferencia_balancetes_app
 from streamlit_option_menu import option_menu
 
 # from streamlit_extras.app_logo import add_logo
@@ -51,12 +52,15 @@ def main():
             [
                 "Tratar Balancetes",
                 "Gerar Balancetes",
+                "Conferencia Balancetes",
             ],
         )
         if balancetes_choice == "Tratar Balancetes":
             run_tratar_balancetes_app()
         elif balancetes_choice == "Gerar Balancetes":
             run_gerar_balancetes_app()
+        elif balancetes_choice == "Conferencia Balancetes":
+            run_conferencia_balancetes_app()
 
 
 if __name__ == "__main__":

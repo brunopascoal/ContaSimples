@@ -24,18 +24,18 @@ def run_tratar_balancetes_app():
 
         # Dicionário com os meses em formato numérico
         meses_numericos = {
-            "01": "jan",
-            "02": "fev",
-            "03": "mar",
-            "04": "abr",
-            "05": "mai",
-            "06": "jun",
-            "07": "jul",
-            "08": "ago",
-            "09": "set",
-            "10": "out",
-            "11": "nov",
-            "12": "dez",
+            "01.": "jan",
+            "02.": "fev",
+            "03.": "mar",
+            "04.": "abr",
+            "05.": "mai",
+            "06.": "jun",
+            "07.": "jul",
+            "08.": "ago",
+            "09.": "set",
+            "10.": "out",
+            "11.": "nov",
+            "12.": "dez",
         }
 
         # Unindo os dois dicionários
@@ -269,6 +269,7 @@ def run_tratar_balancetes_app():
                 if (
                     file_name.endswith(".XLSX")
                     or file_name.endswith(".xls")
+                    or file_name.endswith(".XLS")
                     or file_name.endswith(".xlsx")
                 ):
                     return pd.read_excel(uploaded_file)

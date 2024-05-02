@@ -141,18 +141,18 @@ def run_gerar_balancetes_app():
         )
 
         nome_planilhas = {
-            1: "Jan",
-            2: "Fev",
-            3: "Mar",
-            4: "Abr",
-            5: "Mai",
-            6: "Jun",
-            7: "Jul",
-            8: "Ago",
-            9: "Set",
-            10: "Out",
-            11: "Nov",
-            12: "Dez",
+            1: "jan",
+            2: "fev",
+            3: "mar",
+            4: "abr",
+            5: "mai",
+            6: "jun",
+            7: "jul",
+            8: "ago",
+            9: "set",
+            10: "out",
+            11: "nov",
+            12: "dez",
         }
 
         if st.button("Gerar Balancete", key="gerar_balancete") and uploaded_files:
@@ -161,6 +161,7 @@ def run_gerar_balancetes_app():
                 try:
                     xls = pd.ExcelFile(uploaded_file)
                     sheet_names = xls.sheet_names  # Obtém a lista de todas as planilhas
+
                     # Determina os nomes das planilhas com base na seleção do usuário
                     for mes in range(numMesUm, numUltimoMes + 1):
                         nome_planilha = nome_planilhas.get(
