@@ -107,7 +107,7 @@ def run_tratar_balancetes_app():
             # Removendo espaços e garantindo que a coluna é uma string
             df["CONTA"] = df[coluna_conta].astype(str).str.replace(" ", "", regex=False)
             # Classificando como 'analítica' se a conta termina com 0, caso contrário 'sintética'
-            df["tipo"] = df["CONTA"].apply(lambda x: "A" if x.endswith("0") else "S")
+            df["tipo"] = df["CONTA"].apply(lambda x: "A" if x.endswith("00") else "S")
 
         return df
 
