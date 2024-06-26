@@ -107,7 +107,7 @@ def run_tratar_balancetes_app():
             # Removendo espaços e garantindo que a coluna é uma string
             df["CONTA"] = df[coluna_conta].astype(str).str.replace(" ", "", regex=False)
             # Classificando como 'analítica' se a conta termina com 0, caso contrário 'sintética'
-            df["tipo"] = df["CONTA"].apply(lambda x: "A" if x.endswith("00") else "S")
+            df["tipo"] = df["CONTA"].apply(lambda x: "S" if x.endswith("00") else "A")
 
         return df
 
@@ -348,7 +348,7 @@ def run_tratar_balancetes_app():
 
             tipo_conta = st.selectbox(
                 "Selecione a opção para classificação o Tipo",
-                ["Maiores", "Digito Final"],
+                ["Maiores", "Dois últimos dígitos"],
             )
             # Processando todos os arquivos com as seleções feitas
             for uploaded_file in uploaded_files:

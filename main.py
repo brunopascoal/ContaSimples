@@ -6,6 +6,8 @@ from selecoes import run_selecoes_app
 from tratar_balancetes import run_tratar_balancetes_app
 from gerar_balancetes import run_gerar_balancetes_app
 from conferencia_balancetes import run_conferencia_balancetes_app
+from Teste_SI import run_teste_saldo_inicial_app
+from Compasso import run_compasso_app
 from streamlit_option_menu import option_menu
 
 # from streamlit_extras.app_logo import add_logo
@@ -28,6 +30,7 @@ def main():
                 "Relatorios Financeiros",
                 "Seleções Aleatórias",
                 "Balancetes",
+                "Relatorios Compasso",
             ],
             icons=["house", "gear", "bank", "infinity", "cash-coin"],
             menu_icon="cast",
@@ -46,6 +49,8 @@ def main():
         run_relatorios_app()
     elif app_choice == "Seleções Aleatórias":
         run_selecoes_app()
+    elif app_choice == "Relatorios Compasso":
+        run_compasso_app()
     elif app_choice == "Balancetes":
         balancetes_choice = st.sidebar.selectbox(
             "Escolha a aplicação",
@@ -53,6 +58,7 @@ def main():
                 "Tratar Balancetes",
                 "Gerar Balancetes",
                 "Conferencia Balancetes",
+                "Teste de Saldo Inicial",
             ],
         )
         if balancetes_choice == "Tratar Balancetes":
@@ -61,7 +67,9 @@ def main():
             run_gerar_balancetes_app()
         elif balancetes_choice == "Conferencia Balancetes":
             run_conferencia_balancetes_app()
-
+        elif balancetes_choice == "Teste de Saldo Inicial":
+            run_teste_saldo_inicial_app()
+    
 
 if __name__ == "__main__":
     main()
