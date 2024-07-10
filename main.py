@@ -30,7 +30,7 @@ def main():
             ],
             icons=["house", "gear", "bank", "infinity", "cash-coin"],
             menu_icon="cast",
-            default_index=1,
+            default_index=0,
         )
 
     # Executar a aplicação selecionada
