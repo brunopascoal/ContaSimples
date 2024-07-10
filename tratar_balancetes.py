@@ -6,6 +6,13 @@ import re
 
 def run_tratar_balancetes_app():
     def extrair_mes(nome_arquivo, nome_sheet):
+        # Função para remover anos do nome do arquivo e da sheet
+        def remover_anos(texto):
+            return re.sub(r'\b20[0-9]{2}\b', '', texto)
+        
+        nome_arquivo_sem_anos = remover_anos(nome_arquivo)
+        nome_sheet_sem_anos = remover_anos(nome_sheet)
+        
         # Dicionário com meses escritos por extenso
         meses_escritos = {
             "JAN": "jan",
@@ -24,18 +31,18 @@ def run_tratar_balancetes_app():
 
         # Dicionário com os meses em formato numérico
         meses_numericos = {
-            "01.": "jan",
-            "02.": "fev",
-            "03.": "mar",
-            "04.": "abr",
-            "05.": "mai",
-            "06.": "jun",
-            "07.": "jul",
-            "08.": "ago",
-            "09.": "set",
-            "10.": "out",
-            "11.": "nov",
-            "12.": "dez",
+            "01": "jan",
+            "02": "fev",
+            "03": "mar",
+            "04": "abr",
+            "05": "mai",
+            "06": "jun",
+            "07": "jul",
+            "08": "ago",
+            "09": "set",
+            "10": "out",
+            "11": "nov",
+            "12": "dez",
         }
 
         # Unindo os dois dicionários
@@ -44,8 +51,8 @@ def run_tratar_balancetes_app():
         # Verifica se algum dos meses por extenso ou numérico está no nome do arquivo ou da sheet
         for chave, valor in meses.items():
             if (
-                chave.lower() in nome_arquivo.lower()
-                or chave.lower() in nome_sheet.lower()
+                chave.lower() in nome_arquivo_sem_anos.lower()
+                or chave.lower() in nome_sheet_sem_anos.lower()
             ):
                 return valor
 

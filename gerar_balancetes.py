@@ -27,7 +27,7 @@ def run_gerar_balancetes_app():
     def gerar_sumario(df, mesInicial, mesFinal):
         # Colunas para agrupar e sumarizar
         colunas_sumarizacao = ["CONTA"]
-        colunas_inclusao = ["CONTA", "DESCRIÇÃO", "tipo", "Conta Contabil", "Conta"]
+        colunas_inclusao = ["CONTA", "DESCRIÇÃO", "tipo"]
         # Verifica se deve incluir a coluna 'RED'
         if "RED" in df.columns:
             colunas_inclusao.append("RED")
@@ -94,7 +94,7 @@ def run_gerar_balancetes_app():
         df["CONFERÊNCIA_AUDITORIA"] = df["CONFERÊNCIA_AUDITORIA"].round(2)
 
     def reordenar_colunas(df_sumario, mesInicial, mesFinal):
-        colunas_base = ["CONTA", "DESCRIÇÃO", "Conta Contabil", "Conta"]
+        colunas_base = ["CONTA", "DESCRIÇÃO"]
         colunas_condicionais = [
             col for col in ["tipo", "RED"] if col in df_sumario.columns
         ]
