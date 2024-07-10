@@ -37,7 +37,6 @@ def main():
     if app_choice == "Home":
         st.title("Sistema DI")
         st.divider()  # 👈 Draws a horizontal rule
-
         st.write("Bem-vindo ao Sistema do Departamento Interno!")
     elif app_choice == "SPEDs":
         run_sped_app()
@@ -48,6 +47,10 @@ def main():
     elif app_choice == "Relatorios Compasso":
         run_compasso_app()
     elif app_choice == "Balancetes":
+        # Usar st.session_state para manter o estado
+        if "balancetes_choice" not in st.session_state:
+            st.session_state.balancetes_choice = "Tratar Balancetes"  # Valor padrão
+
         balancetes_choice = st.sidebar.selectbox(
             "Escolha a aplicação",
             [
@@ -56,7 +59,11 @@ def main():
                 "Conferencia Balancetes",
                 "Teste de Saldo Inicial",
             ],
+            index=["Tratar Balancetes", "Gerar Balancetes", "Conferencia Balancetes", "Teste de Saldo Inicial"].index(st.session_state.balancetes_choice),
         )
+
+        st.session_state.balancetes_choice = balancetes_choice  # Atualiza o estado com a escolha do usuário
+
         if balancetes_choice == "Tratar Balancetes":
             run_tratar_balancetes_app()
         elif balancetes_choice == "Gerar Balancetes":
