@@ -3,14 +3,14 @@ import streamlit as st
 from speds import run_sped_app
 from relatorios_financeiros import run_relatorios_app
 from selecoes import run_selecoes_app
-from tratar_balancetes import run_tratar_balancetes_app
-from gerar_balancetes import run_gerar_balancetes_app
-from conferencia_balancetes import run_conferencia_balancetes_app
-from Teste_SI import run_teste_saldo_inicial_app
-from Compasso import run_compasso_app
+from comparativo.tratar_balancetes import run_tratar_balancetes_app
+from comparativo.gerar_balancetes import run_gerar_balancetes_app
+from comparativo.conferencia_balancetes import run_conferencia_balancetes_app
+from comparativo.teste_saldo_inicial import run_teste_saldo_inicial_app
+from compasso.empresa_unica import run_compasso_app
+from compasso.consolidacao import run_compasso_consolidação_app
+from bl_dre_ops import run_bl_e_dre_app
 from streamlit_option_menu import option_menu
-
-# from streamlit_extras.app_logo import add_logo
 
 
 def main():
@@ -27,6 +27,7 @@ def main():
                 "Seleções Aleatórias",
                 "Balancetes",
                 "Relatorios Compasso",
+                "BL e DRE OPS",
             ],
             icons=["house", "gear", "bank", "infinity", "cash-coin"],
             menu_icon="cast",
@@ -45,7 +46,28 @@ def main():
     elif app_choice == "Seleções Aleatórias":
         run_selecoes_app()
     elif app_choice == "Relatorios Compasso":
-        run_compasso_app()
+        # Usar st.session_state para manter o estado
+        if "compasso_choice" not in st.session_state:
+            st.session_state.compasso_choice = "Análise de Empresa Única"  # Valor padrão
+
+        compasso_choice = st.sidebar.selectbox(
+            "Escolha a aplicação",
+            [
+                "Análise de Empresa Única",
+                "Análise Consolidada de Grupo"
+            ],
+            index=["Análise de Empresa Única", "Análise Consolidada de Grupo"].index(st.session_state.compasso_choice),
+        )
+
+        st.session_state.compasso_choice = compasso_choice  # Atualiza o estado com a escolha do usuário
+
+        if compasso_choice == "Análise de Empresa Única":
+            run_compasso_app()
+        elif compasso_choice == "Análise Consolidada de Grupo":
+            run_compasso_consolidação_app()
+
+    elif app_choice == "BL e DRE OPS":
+        run_bl_e_dre_app()
     elif app_choice == "Balancetes":
         # Usar st.session_state para manter o estado
         if "balancetes_choice" not in st.session_state:
