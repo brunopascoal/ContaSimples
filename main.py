@@ -1,15 +1,15 @@
 # app_principal.py
 import streamlit as st
-from speds import run_sped_app
-from relatorios_financeiros import run_relatorios_app
-from selecoes import run_selecoes_app
+from speds.speds import run_sped_app
+from relatorios_financeiros.relatorios_financeiros import run_relatorios_app
+from selecoes_aleatorias.selecoes import run_selecoes_app
 from comparativo.tratar_balancetes import run_tratar_balancetes_app
 from comparativo.gerar_balancetes import run_gerar_balancetes_app
 from comparativo.conferencia_balancetes import run_conferencia_balancetes_app
 from comparativo.teste_saldo_inicial import run_teste_saldo_inicial_app
 from compasso.empresa_unica import run_compasso_app
 from compasso.consolidacao import run_compasso_consolidação_app
-from bl_dre_ops import run_bl_e_dre_app
+from operadoras.bl_dre_ops import run_bl_e_dre_app
 from streamlit_option_menu import option_menu
 
 
