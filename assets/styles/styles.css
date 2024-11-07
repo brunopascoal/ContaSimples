@@ -1,0 +1,20 @@
+/* assets/styles/styles.css */
+
+:root {
+  --text-color-light: #000;
+  /* Cor do texto para o modo claro */
+  --text-color-dark: #fff;
+  /* Cor do texto para o modo escuro */
+}
+
+[data-theme="light"] h2,
+[data-theme="light"] h1,
+[data-theme="light"] p {
+  color: var(--text-color-light);
+}
+
+[data-theme="dark"] h2,
+[data-theme="dark"] h1,
+[data-theme="dark"] p {
+  color: var(--text-color-dark);
+}

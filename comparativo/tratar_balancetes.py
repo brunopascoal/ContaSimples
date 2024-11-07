@@ -178,10 +178,10 @@ def run_tratar_balancetes_app():
             # Converter colunas de dígito para string
             df[colunas_selecionadas["digito_inicial"]] = df[
                 colunas_selecionadas["digito_inicial"]
-            ].astype(str)
+            ].astype(str).str.strip()
             df[colunas_selecionadas["digito_final"]] = df[
                 colunas_selecionadas["digito_final"]
-            ].astype(str)
+            ].astype(str).str.strip()
 
             # Aplicar a lógica de multiplicação
             df[f"SALDO INICIAL {mes.upper()}"] = df.apply(
@@ -273,56 +273,37 @@ def run_tratar_balancetes_app():
             def ler_arquivo(uploaded_file, delimiter=","):
                 # Verificando a extensão do arquivo pelo nome
                 file_name = uploaded_file.name
-                if (
-                    file_name.endswith(".XLSX")
-                    or file_name.endswith(".xls")
-                    or file_name.endswith(".XLS")
-                    or file_name.endswith(".xlsx")
-                ):
+                if file_name.lower().endswith((".xlsx", ".xls")):
                     return pd.read_excel(uploaded_file)
-
-                elif file_name.endswith(".csv"):
+                elif file_name.lower().endswith(".csv"):
                     for encoding in ["utf-8", "latin-1", "iso-8859-1", "cp1252"]:
                         try:
-                            buffer = io.StringIO(
-                                uploaded_file.getvalue().decode(encoding)
-                            )
+                            buffer = io.StringIO(uploaded_file.getvalue().decode(encoding))
                             return pd.read_csv(buffer, delimiter=delimiter)
                         except UnicodeDecodeError:
                             continue
-                    raise ValueError(
-                        "Não foi possível decodificar o arquivo com codificações comuns."
-                    )
-
+                    raise ValueError("Não foi possível decodificar o arquivo com codificações comuns.")
                 else:
                     raise ValueError("Formato de arquivo não suportado")
 
-            # Uso da função
-            exemplo_df = ler_arquivo(
-                uploaded_files[0], delimiter=";"
-            )  # Exemplo com ponto e vírgula como delimitador
+            # Carregar um exemplo para coletar colunas
+            exemplo_df = ler_arquivo(uploaded_files[0], delimiter=";")
             colunas = exemplo_df.columns.tolist()
 
-            # Coletando seleções de coluna
+            # Coletar seleções de coluna
             colunas_selecionadas = {
                 "Nome da Empresa": st.text_input("Digite o nome da empresa"),
                 "conta": st.selectbox("Selecione a coluna para CONTA", colunas),
                 "descricao": st.selectbox("Selecione a coluna para DESCRIÇÃO", colunas),
-                "saldo_inicial": st.selectbox(
-                    "Selecione a coluna para SALDO INICIAL", colunas
-                ),
+                "saldo_inicial": st.selectbox("Selecione a coluna para SALDO INICIAL", colunas),
                 "debito": st.selectbox("Selecione a coluna para DEBITO", colunas),
                 "credito": st.selectbox("Selecione a coluna para CREDITO", colunas),
-                "saldo_final": st.selectbox(
-                    "Selecione a coluna para SALDO FINAL", colunas
-                ),
+                "saldo_final": st.selectbox("Selecione a coluna para SALDO FINAL", colunas),
             }
 
             empresa = colunas_selecionadas["Nome da Empresa"]
 
-            coluna_red = st.selectbox(
-                "Selecione a coluna para RED (opcional)", ["Nenhuma"] + colunas
-            )
+            coluna_red = st.selectbox("Selecione a coluna para RED (opcional)", ["Nenhuma"] + colunas)
             if coluna_red != "Nenhuma":
                 colunas_selecionadas["red"] = coluna_red
 
@@ -338,12 +319,8 @@ def run_tratar_balancetes_app():
             )
 
             if respostaUsuario == "Multiplicar pelo dígito":
-                coluna_digito_inicial = st.selectbox(
-                    "Selecione a coluna para DÍGITO INICIAL", colunas
-                )
-                coluna_digito_final = st.selectbox(
-                    "Selecione a coluna para DÍGITO FINAL", colunas
-                )
+                coluna_digito_inicial = st.selectbox("Selecione a coluna para DÍGITO INICIAL", colunas)
+                coluna_digito_final = st.selectbox("Selecione a coluna para DÍGITO FINAL", colunas)
                 colunas_selecionadas["digito_inicial"] = coluna_digito_inicial
                 colunas_selecionadas["digito_final"] = coluna_digito_final
 
@@ -357,30 +334,33 @@ def run_tratar_balancetes_app():
                 "Selecione a opção para classificação o Tipo",
                 ["Maiores", "Dois últimos dígitos"],
             )
-            # Processando todos os arquivos com as seleções feitas
+
+            # Processar todos os arquivos e consolidar os DataFrames
+            todos_dfs = {}
             for uploaded_file in uploaded_files:
-                todos_dfs = {}
-                for uploaded_file in uploaded_files:
-                    dfs_processados = processar_arquivo(
-                        uploaded_file,
-                        colunas_selecionadas,
-                        tipo_conta,
-                        respostaUsuario,
-                        digitos_passivo_receita,
-                    )
-                    todos_dfs.update(dfs_processados)
-
-                # Escrever todos os DataFrames em um único arquivo Excel
-                output = io.BytesIO()
-                with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
-                    for mes, df in todos_dfs.items():
-                        df.to_excel(writer, sheet_name=mes, index=False)
-
-                st.download_button(
-                    label="Download Excel",
-                    data=output.getvalue(),
-                    file_name=f"Balancetes_Processados_{empresa}.xlsx",
-                    mime="application/vnd.ms-excel",
+                dfs_processados = processar_arquivo(
+                    uploaded_file,
+                    colunas_selecionadas,
+                    tipo_conta,
+                    respostaUsuario,
+                    digitos_passivo_receita,
                 )
+                todos_dfs.update(dfs_processados)
+
+            # Escrever todos os DataFrames em um único arquivo Excel
+            output = io.BytesIO()
+            with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
+                for mes, df in todos_dfs.items():
+                    df.to_excel(writer, sheet_name=mes, index=False)
+
+            # Criar um único botão de download para o arquivo consolidado
+            st.download_button(
+                label="Download Excel",
+                data=output.getvalue(),
+                file_name=f"Balancetes_Processados_{empresa}.xlsx",
+                mime="application/vnd.ms-excel",
+                key="tratar_balancetes_download",
+            )
 
     main()
+

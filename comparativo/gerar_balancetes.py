@@ -205,6 +205,7 @@ def run_gerar_balancetes_app():
                     data=output,
                     file_name="Balancete Final.xlsx",
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    key="gerar_balancetes_download",
                 )
             else:
                 st.write("Deu ruim:")

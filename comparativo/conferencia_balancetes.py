@@ -84,4 +84,5 @@ def run_conferencia_balancetes_app():
             data=result,
             file_name="conferencia_balancetes.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            key="conferencia_balancetes_download",
         )

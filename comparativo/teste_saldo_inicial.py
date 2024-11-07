@@ -57,6 +57,7 @@ def run_teste_saldo_inicial_app():
                 data=result,
                 file_name="Teste de Saldo Inicial.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                key="si_balancetes_download",
             )
     main()
 
