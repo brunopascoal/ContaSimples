@@ -1,4 +1,4 @@
-# Sistema DI
+# ContaSimples
 
 ![GitHub repo size](https://img.shields.io/github/directory-file-count/brunopascoal/sistema_DI?style=for-the-badge)
 ![GitHub language count](https://img.shields.io/github/languages/top/brunopascoal/sistema_DI?style=for-the-badge)
@@ -21,15 +21,6 @@
 
 Acesse o sistema para visualizar as demais funcionalidades
 
-
-### Ajustes e melhorias
-
-O projeto ainda está em desenvolvimento e as próximas atualizações serão voltadas nas seguintes tarefas:
-
-- [ ] Ajuste de maiores nas seleções;
-- [ ] Ajustes na interface;
-- [ ] Inserir SPEDS Contribuições;
-- [ ] Otimização do processo;
 
 ## 💻 Pré-requisitos
 
